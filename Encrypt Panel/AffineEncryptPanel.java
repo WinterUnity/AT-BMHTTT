@@ -5,10 +5,18 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -16,8 +24,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import EncryptMethod.Affine;
+import EncryptMethod.Caesar;
+
 public class AffineEncryptPanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
+	File srcFile, destDir;
+	int[] affineKey;
+	boolean fileUploaded, keyCreated;
 
 	public AffineEncryptPanel() {
 		setLayout(new BorderLayout());
@@ -96,7 +110,6 @@ public class AffineEncryptPanel extends JPanel {
 
 		JTextArea txtArea = new JTextArea(10, 800);
 		txtArea.append("Result");
-//		txtArea.setText(txtArea.getText() + "STT\t\tTen mon hoc\t\t\t\tDiem\n");
 		bot.add(txtArea);
 
 		JScrollPane scrollPane = new JScrollPane(txtArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -113,5 +126,98 @@ public class AffineEncryptPanel extends JPanel {
 		add(subPanel);
 
 		add(bot, BorderLayout.SOUTH);
+
+		/*
+		 * Handle event
+		 */
+		ActionListener buttonListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Upload File
+				if (e.getActionCommand().equals("Choose File")) {
+					JFileChooser fileChooser = new JFileChooser("D:\\");
+					int userChoice = fileChooser.showOpenDialog(AffineEncryptPanel.this);
+					if (userChoice == JFileChooser.APPROVE_OPTION) {
+						srcFile = fileChooser.getSelectedFile();
+						ptTextField.setText(srcFile.getName());
+						fileUploaded = true;
+					}
+				}
+
+				// Create key
+				if (e.getActionCommand().equals("Create key")) {
+					Affine affine = new Affine();
+					try {
+						affineKey = affine.createKey();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					keyATextField.setText(String.valueOf(affineKey[0]));
+					keyBTextField.setText(String.valueOf(affineKey[1]));
+					keyCreated = true;
+				}
+
+				// Encryption
+				if (e.getActionCommand().equals("Encrypt")) {
+					if (ptTextField.getText().isBlank() || 
+						keyATextField.getText().isBlank() ||
+						keyBTextField.getText().isBlank()) {
+						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
+								JOptionPane.ERROR_MESSAGE);
+					} else {
+						JFileChooser dirChooser = new JFileChooser("D:\\");
+						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						int userChoice = dirChooser.showSaveDialog(AffineEncryptPanel.this);
+						if (userChoice == JFileChooser.APPROVE_OPTION) {
+							destDir = dirChooser.getSelectedFile();
+
+							String text = "";
+							int[] key = new int[2];
+
+							// Manual or not
+							if (fileUploaded == true) {
+								text = srcFile.getAbsolutePath();
+							} else {
+								text = ptTextField.getText();
+							}
+
+							if (keyCreated == true) {
+								key = affineKey;
+							} else {
+								key[0] = Integer.parseInt(keyATextField.getText());
+								key[1] = Integer.parseInt(keyBTextField.getText());
+							}
+
+							// Encrypting
+							Affine affine = new Affine();
+							try {
+								affine.encrypt(text, key, destDir);
+
+								// Show result to Text Area
+								txtArea.setText(affine.getEncryptedString());
+
+								// Print key file
+								File destFile = new File(destDir.getAbsolutePath() + "\\AffineKey.txt");
+								FileWriter fw = new FileWriter(destFile);
+								PrintWriter pw = new PrintWriter(fw);
+								pw.println("[" + affineKey[0] + ", " + affineKey[1] + "]");
+								pw.close();
+								fw.close();
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		};
+
+		chooseFile.addActionListener(buttonListener);
+		createKey.addActionListener(buttonListener);
+		encrypt.addActionListener(buttonListener);
+
+		chooseFile.setActionCommand("Choose File");
+		createKey.setActionCommand("Create key");
+		encrypt.setActionCommand("Encrypt");
 	}
 }

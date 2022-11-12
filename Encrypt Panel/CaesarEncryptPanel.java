@@ -82,7 +82,6 @@ public class CaesarEncryptPanel extends JPanel {
 		
 		JTextArea txtArea = new JTextArea(10, 800);
 		txtArea.append("Result");
-//		txtArea.setText(txtArea.getText() + "STT\t\tTen mon hoc\t\t\t\tDiem\n");
 		bot.add(txtArea);
 		
 		JScrollPane scrollPane = new JScrollPane(txtArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
@@ -121,7 +120,7 @@ public class CaesarEncryptPanel extends JPanel {
 				if(e.getActionCommand().equals("Create key")) {
 					Caesar caesar = new Caesar();
 					caesarKey = caesar.createKey();
-					keyTextField.setText(Integer.toString(caesarKey));
+					keyTextField.setText(String.valueOf(caesarKey));
 					keyCreated = true;
 				}
 				
@@ -163,10 +162,10 @@ public class CaesarEncryptPanel extends JPanel {
 								txtArea.setText(caesar.getEncryptedString());
 								
 								//Print key file
-								File destFile = new File(destDir.getAbsolutePath() + "key.txt");
+								File destFile = new File(destDir.getAbsolutePath() + "\\CaesarKey.txt");
 								FileWriter fw = new FileWriter(destFile);
 								PrintWriter pw = new PrintWriter(fw);
-								pw.println(Integer.toString(key));
+								pw.println(String.valueOf(key));
 								pw.close();
 								fw.close();
 							} catch (Exception e1) {

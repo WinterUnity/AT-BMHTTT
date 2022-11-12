@@ -97,7 +97,6 @@ public class SubstitutionEncryptPanel extends JPanel {
 		
 		JTextArea txtArea = new JTextArea(10, 800);
 		txtArea.append("Result");
-//		txtArea.setText(txtArea.getText() + "STT\t\tTen mon hoc\t\t\t\tDiem\n");
 		bot.add(txtArea);
 		
 		JScrollPane scrollPane = new JScrollPane(txtArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
@@ -178,7 +177,7 @@ public class SubstitutionEncryptPanel extends JPanel {
 								txtArea.setText(sub.getEncryptedString());
 								
 								//Print key file
-								File destFile = new File(destDir.getAbsolutePath() + "key.txt");
+								File destFile = new File(destDir.getAbsolutePath() + "\\SubstitutionKey.txt");
 								FileWriter fw = new FileWriter(destFile);
 								PrintWriter pw = new PrintWriter(fw);
 								pw.println(String.valueOf(key));
