@@ -23,7 +23,10 @@ public class Caesar {
 		return decryptedString;
 	}
 
-	// Tạo khóa Caesar
+	/**
+	 * Tạo khóa Caesar
+	 * @return int key
+	 */
 	public int createKey() {
 		Random rd = new Random();
 		while (key == 0) {
@@ -32,15 +35,28 @@ public class Caesar {
 		return key;
 	}
 
-	// Đọc khóa Caesar
+	/**
+	 *  Đọc khóa Caesar
+	 * @param srcFile
+	 * @return int key
+	 * @throws IOException
+	 */
 	public int readKey(File srcFile) throws IOException {
 		FileReader fr = new FileReader(srcFile);
 		BufferedReader br = new BufferedReader(fr);
 		key = Integer.parseInt(br.readLine());
+		br.close();
+		
 		return key;
 	}
 
-	// Mã hóa Caesar
+	/**
+	 *  Mã hóa Caesar
+	 * @param source
+	 * @param input
+	 * @param destDir
+	 * @throws Exception
+	 */
 	public void encrypt(String source, int input, File destDir) throws Exception {
 		String plainText;
 		File file = new File(source);
@@ -54,8 +70,9 @@ public class Caesar {
 		}
 
 		// Encrypting
-		int position, count;
-		int half = 26;
+		int position, count,
+			length = alphabet.length(),
+			half = alphabet.length()/2;
 		encryptedString = "";
 		key = input;
 		for (int i = 0; i < plainText.length(); i++) {
@@ -63,15 +80,15 @@ public class Caesar {
 			for (int j = 0; j < alphabet.length(); j++) {
 				if (plainText.charAt(i) == alphabet.charAt(j)) {
 					if (j < half) {
-						position = (j + key) % 26;
+						position = (j + key) % half;
 						encryptedString += alphabet.charAt(position);
 					} else {
-						position = ((j + key) % 26) + half;
+						position = ((j + key) % half) + half;
 						encryptedString += alphabet.charAt(position);
 					}
 				} else {
 					count++;
-					if (count == 52) {
+					if (count == length) {
 						encryptedString += plainText.charAt(i);
 					}
 				}
@@ -91,7 +108,13 @@ public class Caesar {
 		}
 	}
 
-	// Giải mã Caesar
+	/**
+	 *  Giải mã Caesar
+	 * @param source
+	 * @param input
+	 * @param destDir
+	 * @throws Exception
+	 */
 	public void decrypt(String source, int input, File destDir) throws Exception {
 		String cipherText;
 		File file = new File(source);
@@ -106,7 +129,8 @@ public class Caesar {
 
 		//Decrypting
 		int position, count;
-		int half = 26;
+		int length = alphabet.length(),
+			half = alphabet.length()/2;
 		decryptedString = "";
 		key = input;
 		for (int i = 0; i < cipherText.length(); i++) {
@@ -115,10 +139,10 @@ public class Caesar {
 				if (cipherText.charAt(i) == alphabet.charAt(j)) {
 					if (j < half) {
 						if (j - key < 0) {
-							position = (j - key + half) % 26;
+							position = (j - key + half) % half;
 							decryptedString += alphabet.charAt(position);
 						} else {
-							position = (j - key) % 26;
+							position = (j - key) % half;
 							decryptedString += alphabet.charAt(position);
 						}
 					} else {
@@ -127,7 +151,7 @@ public class Caesar {
 					}
 				} else {
 					count++;
-					if (count == 52) {
+					if (count == length) {
 						decryptedString += cipherText.charAt(i);
 					}
 				}
@@ -145,15 +169,5 @@ public class Caesar {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		Caesar c = new Caesar();
-		File keyFile = new File("E:\\key.txt");
-		
-//		c.createKey();
-		c.readKey(keyFile);
-//		c.encrypt("D:\\BMHTTT\\Caesar\\SourceText.txt");
-//		c.decrypt("CipherText.txt");
 	}
 }
