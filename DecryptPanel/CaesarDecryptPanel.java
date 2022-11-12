@@ -29,7 +29,7 @@ public class CaesarDecryptPanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File textFile, keyFile, destDir;
 	int caesarKey;
-	boolean fileUploaded, keyCreated;
+	boolean fileUploaded, keyUploaded;
 
 	public CaesarDecryptPanel() {
 		setLayout(new BorderLayout());
@@ -46,11 +46,11 @@ public class CaesarDecryptPanel extends JPanel {
 		JPanel ctPanel = new JPanel();
 		ctPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JLabel ptLabel = new JLabel("Cipher Text");
-		JTextField ptTextField = new JTextField(30);
-		ptTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		ctPanel.add(ptLabel);
-		ctPanel.add(ptTextField);
+		JLabel ctLabel = new JLabel("Cipher Text");
+		JTextField ctTextField = new JTextField(30);
+		ctTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		ctPanel.add(ctLabel);
+		ctPanel.add(ctTextField);
 
 		top.add(ctPanel);
 
@@ -125,12 +125,12 @@ public class CaesarDecryptPanel extends JPanel {
 					int userChoice = textFileChooser.showOpenDialog(CaesarDecryptPanel.this);
 					if(userChoice == JFileChooser.APPROVE_OPTION) {
 						textFile = textFileChooser.getSelectedFile();
-						ptTextField.setText(textFile.getName());
+						ctTextField.setText(textFile.getName());
 						fileUploaded = true;
 					}
 				}
 				
-				//Create key
+				//Load key
 				if(e.getActionCommand().equals("Load key")) {
 					JFileChooser keyFileChooser = new JFileChooser("D:\\");
 					int userChoice = keyFileChooser.showOpenDialog(CaesarDecryptPanel.this);
@@ -145,15 +145,15 @@ public class CaesarDecryptPanel extends JPanel {
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
-						keyTextField.setText(Integer.toString(caesarKey));
-						keyCreated = true;
+						keyTextField.setText(String.valueOf(caesarKey));
+						keyUploaded = true;
 					}
 					
 				}
 				
 				//Decryption
 				if(e.getActionCommand().equals("Decrypt")) {
-					if(ptTextField.getText().isBlank() ||
+					if(ctTextField.getText().isBlank() ||
 						keyTextField.getText().isBlank()) {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error", JOptionPane.ERROR_MESSAGE);
 					}
@@ -172,10 +172,10 @@ public class CaesarDecryptPanel extends JPanel {
 							if(fileUploaded == true) {
 								text = textFile.getAbsolutePath();
 							} else {
-								text = ptTextField.getText();
+								text = ctTextField.getText();
 							}
 							
-							if(keyCreated == true) {
+							if(keyUploaded == true) {
 								key = caesarKey;
 							} else {
 								key = Integer.parseInt(keyTextField.getText());

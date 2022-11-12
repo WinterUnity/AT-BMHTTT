@@ -5,10 +5,17 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -16,8 +23,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import EncryptMethod.Affine;
+import EncryptMethod.Caesar;
+
 public class AffineDecryptPanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
+	File textFile, keyFile, destDir;
+	int[] affineKey;
+	boolean fileUploaded, keyUploaded;
 
 	public AffineDecryptPanel() {
 		setLayout(new BorderLayout());
@@ -34,11 +47,11 @@ public class AffineDecryptPanel extends JPanel {
 		JPanel ctPanel = new JPanel();
 		ctPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JLabel ptLabel = new JLabel("Cipher Text");
-		JTextField ptTextField = new JTextField(30);
-		ptTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		ctPanel.add(ptLabel);
-		ctPanel.add(ptTextField);
+		JLabel ctLabel = new JLabel("Cipher Text");
+		JTextField ctTextField = new JTextField(30);
+		ctTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		ctPanel.add(ctLabel);
+		ctPanel.add(ctTextField);
 
 		top.add(ctPanel);
 
@@ -112,5 +125,98 @@ public class AffineDecryptPanel extends JPanel {
 		add(subPanel);
 
 		add(bot, BorderLayout.SOUTH);
+		
+		/*
+		 * Handle event
+		 */
+		ActionListener buttonListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//Upload File
+				if (e.getActionCommand().equals("Choose File")) {
+					JFileChooser textFileChooser = new JFileChooser("D:\\");
+					int userChoice = textFileChooser.showOpenDialog(AffineDecryptPanel.this);
+					if(userChoice == JFileChooser.APPROVE_OPTION) {
+						textFile = textFileChooser.getSelectedFile();
+						ctTextField.setText(textFile.getName());
+						fileUploaded = true;
+					}
+				}
+				
+				//Load key
+				if(e.getActionCommand().equals("Load key")) {
+					JFileChooser keyFileChooser = new JFileChooser("D:\\");
+					int userChoice = keyFileChooser.showOpenDialog(AffineDecryptPanel.this);
+					if(userChoice == JFileChooser.APPROVE_OPTION) {
+						keyFile = keyFileChooser.getSelectedFile();
+						
+						Affine affine = new Affine();
+						try {
+							affineKey = affine.readKey(keyFile);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						keyATextField.setText(String.valueOf(affineKey[0]));
+						keyBTextField.setText(String.valueOf(affineKey[1]));
+						keyUploaded = true;
+					}
+					
+				}
+				
+				//Decryption
+				if(e.getActionCommand().equals("Decrypt")) {
+					if(ctTextField.getText().isBlank() ||
+						keyATextField.getText().isBlank() ||
+						keyBTextField.getText().isBlank()) {
+						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					else {
+						//Choose Directory to save decrypted file
+						JFileChooser dirChooser = new JFileChooser("D:\\");
+						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						int userChoice = dirChooser.showSaveDialog(AffineDecryptPanel.this);
+						if(userChoice == JFileChooser.APPROVE_OPTION) {
+							destDir = dirChooser.getSelectedFile();
+							
+							String text = "";
+							int[] key = new int[2];
+							
+							//Manual or not
+							if(fileUploaded == true) {
+								text = textFile.getAbsolutePath();
+							} else {
+								text = ctTextField.getText();
+							}
+							
+							if(keyUploaded == true) {
+								key = affineKey;
+							} else {
+								key[0] = Integer.parseInt(keyATextField.getText());
+								key[1] = Integer.parseInt(keyBTextField.getText());
+							}
+							
+							//Decrypting
+							Affine affine = new Affine();
+							try {
+								affine.decrypt(text, key, destDir);
+								
+								//Show result to Text Area
+								txtArea.setText(affine.getDecryptedString());
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		};
+		
+		chooseFile.addActionListener(buttonListener);
+		loadKey.addActionListener(buttonListener);
+		decrypt.addActionListener(buttonListener);
+		
+		chooseFile.setActionCommand("Choose File");
+		loadKey.setActionCommand("Load key");
+		decrypt.setActionCommand("Decrypt");
 	}
 }

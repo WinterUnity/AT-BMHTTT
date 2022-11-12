@@ -5,10 +5,17 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -16,8 +23,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import EncryptMethod.Caesar;
+import EncryptMethod.Substitution;
+
 public class SubstitutionDecryptPanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
+	File textFile, keyFile, destDir;
+	char[] subKey;
+	boolean fileUploaded, keyUploaded;
 
 	public SubstitutionDecryptPanel() {
 		setLayout(new BorderLayout());
@@ -34,11 +47,11 @@ public class SubstitutionDecryptPanel extends JPanel {
 		JPanel ctPanel = new JPanel();
 		ctPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JLabel ptLabel = new JLabel("Cipher Text");
-		JTextField ptTextField = new JTextField(30);
-		ptTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		ctPanel.add(ptLabel);
-		ctPanel.add(ptTextField);
+		JLabel ctLabel = new JLabel("Cipher Text");
+		JTextField ctTextField = new JTextField(30);
+		ctTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		ctPanel.add(ctLabel);
+		ctPanel.add(ctTextField);
 
 		top.add(ctPanel);
 
@@ -100,5 +113,100 @@ public class SubstitutionDecryptPanel extends JPanel {
 		add(subPanel);
 		
 		add(bot, BorderLayout.SOUTH);
+		
+		/*
+		 * Handle event
+		 */
+		ActionListener buttonListener = new ActionListener() {
+			private int caesarKey;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//Upload File
+				if (e.getActionCommand().equals("Choose File")) {
+					JFileChooser textFileChooser = new JFileChooser("D:\\");
+					int userChoice = textFileChooser.showOpenDialog(SubstitutionDecryptPanel.this);
+					if(userChoice == JFileChooser.APPROVE_OPTION) {
+						textFile = textFileChooser.getSelectedFile();
+						ctTextField.setText(textFile.getName());
+						fileUploaded = true;
+					}
+				}
+				
+				//Load key
+				if(e.getActionCommand().equals("Load key")) {
+					JFileChooser keyFileChooser = new JFileChooser("D:\\");
+					int userChoice = keyFileChooser.showOpenDialog(SubstitutionDecryptPanel.this);
+					if(userChoice == JFileChooser.APPROVE_OPTION) {
+						keyFile = keyFileChooser.getSelectedFile();
+						
+						Substitution sub = new Substitution();
+						try {
+							subKey = sub.readKey(keyFile);
+						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						keyTextField.setText(String.valueOf(subKey));
+						keyUploaded = true;
+					}
+					
+				}
+				
+				//Decryption
+				if(e.getActionCommand().equals("Decrypt")) {
+					if(ctTextField.getText().isBlank() ||
+						keyTextField.getText().isBlank()) {
+						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					else {
+						//Choose Directory to save decrypted file
+						JFileChooser dirChooser = new JFileChooser("D:\\");
+						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						int userChoice = dirChooser.showSaveDialog(SubstitutionDecryptPanel.this);
+						if(userChoice == JFileChooser.APPROVE_OPTION) {
+							destDir = dirChooser.getSelectedFile();
+							
+							String text = "";
+							char[] key;
+							
+							//Manual or not
+							if(fileUploaded == true) {
+								text = textFile.getAbsolutePath();
+							} else {
+								text = ctTextField.getText();
+							}
+							
+							if(keyUploaded == true) {
+								key = subKey;
+							} else {
+								String keyString  = keyTextField.getText();
+								key = keyString.toCharArray();
+							}
+							
+							//Decrypting
+							Substitution sub = new Substitution();
+							try {
+								sub.decrypt(text, key, destDir);
+								
+								//Show result to Text Area
+								txtArea.setText(sub.getDecryptedString());
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		};
+		
+		chooseFile.addActionListener(buttonListener);
+		loadKey.addActionListener(buttonListener);
+		decrypt.addActionListener(buttonListener);
+		
+		chooseFile.setActionCommand("Choose File");
+		loadKey.setActionCommand("Load key");
+		decrypt.setActionCommand("Decrypt");
 	}
 }
