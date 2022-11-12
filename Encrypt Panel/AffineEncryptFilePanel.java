@@ -7,15 +7,15 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.Affine;
+import EncryptMethod.AffineFile;
 
-public class AffineEncryptPanel extends JPanel {
+public class AffineEncryptFilePanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File srcFile, destDir;
 	int[] affineKey;
 	boolean fileUploaded, keyCreated;
 
-	public AffineEncryptPanel() {
+	public AffineEncryptFilePanel() {
 		setLayout(new BorderLayout());
 
 		/*
@@ -24,7 +24,7 @@ public class AffineEncryptPanel extends JPanel {
 		top = new JPanel();
 		top.setLayout(new GridLayout(5, 1));
 		Border topBD = BorderFactory.createLineBorder(Color.blue);
-		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Mã hóa Affine"));
+		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Mã hóa Affine - File"));
 
 		// PlainText
 		JPanel ptPanel = new JPanel();
@@ -118,7 +118,7 @@ public class AffineEncryptPanel extends JPanel {
 				// Upload File
 				if (e.getActionCommand().equals("Choose File")) {
 					JFileChooser fileChooser = new JFileChooser("D:\\");
-					int userChoice = fileChooser.showOpenDialog(AffineEncryptPanel.this);
+					int userChoice = fileChooser.showOpenDialog(AffineEncryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						srcFile = fileChooser.getSelectedFile();
 						ptTextField.setText(srcFile.getName());
@@ -128,7 +128,7 @@ public class AffineEncryptPanel extends JPanel {
 
 				// Create key
 				if (e.getActionCommand().equals("Create key")) {
-					Affine affine = new Affine();
+					AffineFile affine = new AffineFile();
 					try {
 						affineKey = affine.createKey();
 					} catch (IOException e1) {
@@ -141,53 +141,49 @@ public class AffineEncryptPanel extends JPanel {
 
 				// Encryption
 				if (e.getActionCommand().equals("Encrypt")) {
-					if (ptTextField.getText().isBlank() || 
-						keyATextField.getText().isBlank() ||
-						keyBTextField.getText().isBlank()) {
+					if (ptTextField.getText().isBlank() || keyATextField.getText().isBlank()
+							|| keyBTextField.getText().isBlank()) {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
-						JFileChooser dirChooser = new JFileChooser("D:\\");
-						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						int userChoice = dirChooser.showSaveDialog(AffineEncryptPanel.this);
-						if (userChoice == JFileChooser.APPROVE_OPTION) {
-							destDir = dirChooser.getSelectedFile();
+						if (fileUploaded != true) {
+							JOptionPane.showMessageDialog(null, "File not uploaded", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} else {
+							JFileChooser dirChooser = new JFileChooser("D:\\");
+							dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							int userChoice = dirChooser.showSaveDialog(AffineEncryptFilePanel.this);
+							if (userChoice == JFileChooser.APPROVE_OPTION) {
+								destDir = dirChooser.getSelectedFile();
 
-							String text = "";
-							int[] key = new int[2];
+								int[] key = new int[2];
 
-							// Manual or not
-							if (fileUploaded == true) {
-								text = srcFile.getAbsolutePath();
-							} else {
-								text = ptTextField.getText();
-							}
+								// Manual or not
+								if (keyCreated == true) {
+									key = affineKey;
+								} else {
+									key[0] = Integer.parseInt(keyATextField.getText());
+									key[1] = Integer.parseInt(keyBTextField.getText());
+								}
 
-							if (keyCreated == true) {
-								key = affineKey;
-							} else {
-								key[0] = Integer.parseInt(keyATextField.getText());
-								key[1] = Integer.parseInt(keyBTextField.getText());
-							}
+								// Encrypting
+								AffineFile affineFile = new AffineFile();
+								try {
+									affineFile.encrypt(srcFile, key, destDir);
 
-							// Encrypting
-							Affine affine = new Affine();
-							try {
-								affine.encrypt(text, key, destDir);
+									// Show result to Text Area
+									txtArea.setText("Encrypt successfully to " + destDir.getAbsolutePath());
 
-								// Show result to Text Area
-								txtArea.setText("Result");
-								txtArea.append("\n" + affine.getEncryptedString());
-
-								// Print key file
-								File destFile = new File(destDir.getAbsolutePath() + "\\AffineKey.txt");
-								FileWriter fw = new FileWriter(destFile);
-								PrintWriter pw = new PrintWriter(fw);
-								pw.println("[" + affineKey[0] + ", " + affineKey[1] + "]");
-								pw.close();
-								fw.close();
-							} catch (Exception e1) {
-								e1.printStackTrace();
+									// Print key file
+									File destFile = new File(destDir.getAbsolutePath() + "\\AffineKey.txt");
+									FileWriter fw = new FileWriter(destFile);
+									PrintWriter pw = new PrintWriter(fw);
+									pw.println("[" + affineKey[0] + ", " + affineKey[1] + "]");
+									pw.close();
+									fw.close();
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
 							}
 						}
 					}

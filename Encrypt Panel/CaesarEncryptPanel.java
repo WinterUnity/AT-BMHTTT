@@ -5,11 +5,9 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 
-import EncryptMethod.*;
+import EncryptMethod.Caesar;
 
 public class CaesarEncryptPanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
@@ -159,7 +157,8 @@ public class CaesarEncryptPanel extends JPanel {
 								caesar.encrypt(text, key, destDir);
 								
 								//Show result to Text Area
-								txtArea.setText(caesar.getEncryptedString());
+								txtArea.setText("Result");
+								txtArea.append("\n" + caesar.getEncryptedString());
 								
 								//Print key file
 								File destFile = new File(destDir.getAbsolutePath() + "\\CaesarKey.txt");

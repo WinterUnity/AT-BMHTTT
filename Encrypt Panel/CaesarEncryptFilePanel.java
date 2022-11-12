@@ -2,20 +2,20 @@ package EncryptPanel;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.Affine;
+import java.io.*;
 
-public class AffineEncryptPanel extends JPanel {
+import EncryptMethod.CaesarFile;
+
+public class CaesarEncryptFilePanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File srcFile, destDir;
-	int[] affineKey;
+	int caesarKey;
 	boolean fileUploaded, keyCreated;
 
-	public AffineEncryptPanel() {
+	public CaesarEncryptFilePanel() {
 		setLayout(new BorderLayout());
 
 		/*
@@ -24,7 +24,7 @@ public class AffineEncryptPanel extends JPanel {
 		top = new JPanel();
 		top.setLayout(new GridLayout(5, 1));
 		Border topBD = BorderFactory.createLineBorder(Color.blue);
-		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Mã hóa Affine"));
+		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Mã hóa Caesar - File"));
 
 		// PlainText
 		JPanel ptPanel = new JPanel();
@@ -38,29 +38,17 @@ public class AffineEncryptPanel extends JPanel {
 
 		top.add(ptPanel);
 
-		// KeyA
-		JPanel keyAPanel = new JPanel();
-		keyAPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		// Key
+		JPanel keyPanel = new JPanel();
+		keyPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JLabel keyALabel = new JLabel("KeyA");
-		JTextField keyATextField = new JTextField(30);
-		keyATextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		keyAPanel.add(keyALabel);
-		keyAPanel.add(keyATextField);
+		JLabel keyLabel = new JLabel("Key");
+		JTextField keyTextField = new JTextField(30);
+		keyTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		keyPanel.add(keyLabel);
+		keyPanel.add(keyTextField);
 
-		top.add(keyAPanel);
-
-		// KeyB
-		JPanel keyBPanel = new JPanel();
-		keyBPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
-		JLabel keyBLabel = new JLabel("KeyB");
-		JTextField keyBTextField = new JTextField(30);
-		keyBTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		keyBPanel.add(keyBLabel);
-		keyBPanel.add(keyBTextField);
-
-		top.add(keyBPanel);
+		top.add(keyPanel);
 
 		/*
 		 * Mid Layout
@@ -118,7 +106,7 @@ public class AffineEncryptPanel extends JPanel {
 				// Upload File
 				if (e.getActionCommand().equals("Choose File")) {
 					JFileChooser fileChooser = new JFileChooser("D:\\");
-					int userChoice = fileChooser.showOpenDialog(AffineEncryptPanel.this);
+					int userChoice = fileChooser.showOpenDialog(CaesarEncryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						srcFile = fileChooser.getSelectedFile();
 						ptTextField.setText(srcFile.getName());
@@ -128,66 +116,56 @@ public class AffineEncryptPanel extends JPanel {
 
 				// Create key
 				if (e.getActionCommand().equals("Create key")) {
-					Affine affine = new Affine();
-					try {
-						affineKey = affine.createKey();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-					keyATextField.setText(String.valueOf(affineKey[0]));
-					keyBTextField.setText(String.valueOf(affineKey[1]));
+					CaesarFile caesar = new CaesarFile();
+					caesarKey = caesar.createKey();
+					keyTextField.setText(String.valueOf(caesarKey));
 					keyCreated = true;
 				}
 
 				// Encryption
 				if (e.getActionCommand().equals("Encrypt")) {
-					if (ptTextField.getText().isBlank() || 
-						keyATextField.getText().isBlank() ||
-						keyBTextField.getText().isBlank()) {
+					if (ptTextField.getText().isBlank() || keyTextField.getText().isBlank()) {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
-						JFileChooser dirChooser = new JFileChooser("D:\\");
-						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						int userChoice = dirChooser.showSaveDialog(AffineEncryptPanel.this);
-						if (userChoice == JFileChooser.APPROVE_OPTION) {
-							destDir = dirChooser.getSelectedFile();
+						if (fileUploaded != true) {
+							JOptionPane.showMessageDialog(null, "Source file not uploaded", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} else {
+							JFileChooser dirChooser = new JFileChooser("D:\\");
+							dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							int userChoice = dirChooser.showSaveDialog(CaesarEncryptFilePanel.this);
+							if (userChoice == JFileChooser.APPROVE_OPTION) {
+								destDir = dirChooser.getSelectedFile();
 
-							String text = "";
-							int[] key = new int[2];
+								int key = 0;
 
-							// Manual or not
-							if (fileUploaded == true) {
-								text = srcFile.getAbsolutePath();
-							} else {
-								text = ptTextField.getText();
-							}
+								// Manual or not
+								if (keyCreated == true) {
+									key = caesarKey;
+								} else {
+									key = Integer.parseInt(keyTextField.getText());
+								}
 
-							if (keyCreated == true) {
-								key = affineKey;
-							} else {
-								key[0] = Integer.parseInt(keyATextField.getText());
-								key[1] = Integer.parseInt(keyBTextField.getText());
-							}
+								// Encrypting
+								CaesarFile caesarFile = new CaesarFile();
+								try {
+									caesarFile.encrypt(srcFile, key, destDir);
 
-							// Encrypting
-							Affine affine = new Affine();
-							try {
-								affine.encrypt(text, key, destDir);
+									// Show result to Text Area
+									txtArea.setText("Result");
+									txtArea.append("\nFile encrypted success fully");
 
-								// Show result to Text Area
-								txtArea.setText("Result");
-								txtArea.append("\n" + affine.getEncryptedString());
-
-								// Print key file
-								File destFile = new File(destDir.getAbsolutePath() + "\\AffineKey.txt");
-								FileWriter fw = new FileWriter(destFile);
-								PrintWriter pw = new PrintWriter(fw);
-								pw.println("[" + affineKey[0] + ", " + affineKey[1] + "]");
-								pw.close();
-								fw.close();
-							} catch (Exception e1) {
-								e1.printStackTrace();
+									// Print key file
+									File destFile = new File(destDir.getAbsolutePath() + "\\CaesarFileKey.txt");
+									FileWriter fw = new FileWriter(destFile);
+									PrintWriter pw = new PrintWriter(fw);
+									pw.println(String.valueOf(key));
+									pw.close();
+									fw.close();
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
 							}
 						}
 					}

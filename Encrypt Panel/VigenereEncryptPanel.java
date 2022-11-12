@@ -1,33 +1,11 @@
 package EncryptPanel;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.Caesar;
 import EncryptMethod.Vigenere;
 
 public class VigenereEncryptPanel extends JPanel {
@@ -225,7 +203,8 @@ public class VigenereEncryptPanel extends JPanel {
 								vigenere.encrypt(text, key, destDir);
 
 								// Show result to Text Area
-								txtArea.setText(vigenere.getEncryptedString());
+								txtArea.setText("Result");
+								txtArea.append("\n" + vigenere.getEncryptedString());
 
 								// Print key file
 								String keyPrint = "";
