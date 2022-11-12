@@ -47,6 +47,7 @@ public class MyFrame extends JFrame {
 		fileMenu.add(defaultItem);
 
 		// Exit menu item
+		fileMenu.addSeparator();
 		JMenuItem exitItem = new JMenuItem("Exit");
 		exitItem.setMnemonic(KeyEvent.VK_E);
 		exitItem.addActionListener(new ActionListener() {
@@ -71,6 +72,7 @@ public class MyFrame extends JFrame {
 		encryptMenu.add(caesarEncryptItem);
 
 		// Substitution encrypt menu item
+		encryptMenu.addSeparator();
 		JMenuItem subEncrptItem = new JMenuItem("Mã hóa Substitution");
 		subEncrptItem.setMnemonic(KeyEvent.VK_S);
 		subEncrptItem.setActionCommand("SubstitutionEncrypt");
@@ -78,6 +80,7 @@ public class MyFrame extends JFrame {
 		encryptMenu.add(subEncrptItem);
 
 		// Affine encrypt menu item
+		encryptMenu.addSeparator();
 		JMenuItem affineEncryptItem = new JMenuItem("Mã hóa Affine");
 		affineEncryptItem.setMnemonic(KeyEvent.VK_A);
 		affineEncryptItem.setDisplayedMnemonicIndex(7);
@@ -86,12 +89,13 @@ public class MyFrame extends JFrame {
 		encryptMenu.add(affineEncryptItem);
 
 		// Vigenere encrypt menu item
+		encryptMenu.addSeparator();
 		JMenuItem vigenereEncryptItem = new JMenuItem("Mã hóa Vigenere");
 		vigenereEncryptItem.setMnemonic(KeyEvent.VK_V);
 		vigenereEncryptItem.setActionCommand("VigenereEncrypt");
 		vigenereEncryptItem.addActionListener(itemAction);
 		encryptMenu.add(vigenereEncryptItem);
-		
+
 		/*
 		 * Decrypt Menu
 		 */
@@ -106,6 +110,7 @@ public class MyFrame extends JFrame {
 		decryptMenu.add(caesarDecryptItem);
 
 		// Substitution decrypt menu item
+		decryptMenu.addSeparator();
 		JMenuItem subDecryptItem = new JMenuItem("Giải mã Substitution");
 		subDecryptItem.setMnemonic(KeyEvent.VK_S);
 		subDecryptItem.setActionCommand("SubstitutionDecrypt");
@@ -113,6 +118,7 @@ public class MyFrame extends JFrame {
 		decryptMenu.add(subDecryptItem);
 
 		// Affine decrypt menu item
+		decryptMenu.addSeparator();
 		JMenuItem affineDecryptItem = new JMenuItem("Giải mã Affine");
 		affineDecryptItem.setMnemonic(KeyEvent.VK_A);
 		affineDecryptItem.setActionCommand("AffineDecrypt");
@@ -120,11 +126,87 @@ public class MyFrame extends JFrame {
 		decryptMenu.add(affineDecryptItem);
 
 		// Vigenere decrypt menu item
+		decryptMenu.addSeparator();
 		JMenuItem vigenereDecryptItem = new JMenuItem("Giải mã Vigenere");
 		vigenereDecryptItem.setMnemonic(KeyEvent.VK_V);
 		vigenereDecryptItem.setActionCommand("VigenereDecrypt");
 		vigenereDecryptItem.addActionListener(itemAction);
 		decryptMenu.add(vigenereDecryptItem);
+
+		/*
+		 * Encrypt File menu
+		 */
+		JMenu encryptFileMenu = new JMenu("Mã hóa File");
+		menuBar.add(encryptFileMenu);
+
+		// Caesar Encrypt File menu item
+		JMenuItem caesarEncryptFileItem = new JMenuItem("Mã hóa Caesar");
+		caesarEncryptFileItem.setMnemonic(KeyEvent.VK_C);
+		caesarEncryptFileItem.setActionCommand("CaesarEncryptFile");
+		caesarEncryptFileItem.addActionListener(itemAction);
+		encryptFileMenu.add(caesarEncryptFileItem);
+
+		// Substitution encrypt menu item
+		encryptFileMenu.addSeparator();
+		JMenuItem subEncryptFileItem = new JMenuItem("Mã hóa Substitution");
+		subEncryptFileItem.setMnemonic(KeyEvent.VK_S);
+		subEncryptFileItem.setActionCommand("SubstitutionEncryptFile");
+		subEncryptFileItem.addActionListener(itemAction);
+		encryptFileMenu.add(subEncryptFileItem);
+
+		// Affine encrypt menu item
+		encryptFileMenu.addSeparator();
+		JMenuItem affineEncryptFileItem = new JMenuItem("Mã hóa Affine");
+		affineEncryptFileItem.setMnemonic(KeyEvent.VK_A);
+		affineEncryptFileItem.setDisplayedMnemonicIndex(7);
+		affineEncryptFileItem.setActionCommand("AffineEncryptFile");
+		affineEncryptFileItem.addActionListener(itemAction);
+		encryptFileMenu.add(affineEncryptFileItem);
+
+		// Vigenere encrypt menu item
+		encryptFileMenu.addSeparator();
+		JMenuItem vigenereEncryptFileItem = new JMenuItem("Mã hóa Vigenere");
+		vigenereEncryptFileItem.setMnemonic(KeyEvent.VK_V);
+		vigenereEncryptFileItem.setActionCommand("VigenereEncryptItem");
+		vigenereEncryptFileItem.addActionListener(itemAction);
+		encryptFileMenu.add(vigenereEncryptFileItem);
+		
+		/*
+		 * Decrypt File Menu
+		 */
+		JMenu decryptFileMenu = new JMenu("Giải mã File");
+		menuBar.add(decryptFileMenu);
+
+		// Caesar decrypt file menu item
+		JMenuItem caesarDecryptFileItem = new JMenuItem("Giải mã Caesar");
+		caesarDecryptFileItem.setMnemonic(KeyEvent.VK_C);
+		caesarDecryptFileItem.setActionCommand("CaesarDecryptFile");
+		caesarDecryptFileItem.addActionListener(itemAction);
+		decryptFileMenu.add(caesarDecryptFileItem);
+
+		// Substitution decrypt file menu item
+		decryptFileMenu.addSeparator();
+		JMenuItem subDecryptFileItem = new JMenuItem("Giải mã Substitution");
+		subDecryptFileItem.setMnemonic(KeyEvent.VK_S);
+		subDecryptFileItem.setActionCommand("SubstitutionDecryptFile");
+		subDecryptFileItem.addActionListener(itemAction);
+		decryptFileMenu.add(subDecryptFileItem);
+
+		// Affine decrypt file menu item
+		decryptFileMenu.addSeparator();
+		JMenuItem affineDecryptFileItem = new JMenuItem("Giải mã Affine");
+		affineDecryptFileItem.setMnemonic(KeyEvent.VK_A);
+		affineDecryptFileItem.setActionCommand("AffineDecryptFile");
+		affineDecryptFileItem.addActionListener(itemAction);
+		decryptFileMenu.add(affineDecryptFileItem);
+
+		// Vigenere decrypt file menu item
+		decryptFileMenu.addSeparator();
+		JMenuItem vigenereDecryptFileItem = new JMenuItem("Giải mã Vigenere");
+		vigenereDecryptFileItem.setMnemonic(KeyEvent.VK_V);
+		vigenereDecryptFileItem.setActionCommand("VigenereDecryptFile");
+		vigenereDecryptFileItem.addActionListener(itemAction);
+		decryptFileMenu.add(vigenereDecryptFileItem);
 
 		return menuBar;
 	}

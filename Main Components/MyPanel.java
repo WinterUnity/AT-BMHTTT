@@ -10,7 +10,9 @@ import DecryptPanel.*;
 public class MyPanel extends JPanel{
 	JPanel mainPanel, defaultPanel,
 			caesarEncryptPanel, substitutionEncryptPanel, affineEncryptPanel, vigenereEncryptPanel,
-			caesarDecryptPanel, substitutionDecryptPanel, affineDecryptPanel, vigenereDecryptPanel;
+			caesarDecryptPanel, substitutionDecryptPanel, affineDecryptPanel, vigenereDecryptPanel,
+			caesarEncryptFilePanel, substitutionEncryptFilePanel, affineEncryptFilePanel, vigenereEncryptFilePanel,
+			caesarDecryptFilePanel, substitutionDecryptFilePanel, affineDecryptFilePanel, vigenereDecryptFilePanel;
 	
 	CardLayout cardLayout;
 	
@@ -31,6 +33,10 @@ public class MyPanel extends JPanel{
 		affineDecryptPanel = new AffineDecryptPanel();
 		vigenereDecryptPanel = new VigenereDecryptPanel();
 		
+		caesarEncryptFilePanel = new CaesarEncryptFilePanel();
+		
+		caesarDecryptFilePanel = new CaesarDecryptFilePanel();
+		
 		
 		
 		mainPanel.add("Home", defaultPanel);
@@ -43,6 +49,10 @@ public class MyPanel extends JPanel{
 		mainPanel.add("SubstitutionDecrypt", substitutionDecryptPanel);
 		mainPanel.add("AffineDecrypt", affineDecryptPanel);
 		mainPanel.add("VigenereDecrypt", vigenereDecryptPanel);
+		
+		mainPanel.add("CaesarEncryptFile", caesarEncryptFilePanel);
+		
+		mainPanel.add("CaesarDecryptFile", caesarDecryptFilePanel);
 		
 		add(mainPanel, BorderLayout.CENTER);
 	}
