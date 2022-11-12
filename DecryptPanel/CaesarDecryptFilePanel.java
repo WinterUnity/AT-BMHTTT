@@ -3,18 +3,19 @@ package DecryptPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.Vigenere;
+import EncryptMethod.CaesarFile;
 
-public class VigenereDecryptPanel extends JPanel {
+public class CaesarDecryptFilePanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File textFile, keyFile, destDir;
-	int[] vigenereKey;
+	int caesarKey;
 	boolean fileUploaded, keyUploaded;
 
-	public VigenereDecryptPanel() {
+	public CaesarDecryptFilePanel() {
 		setLayout(new BorderLayout());
 
 		/*
@@ -23,7 +24,7 @@ public class VigenereDecryptPanel extends JPanel {
 		top = new JPanel();
 		top.setLayout(new GridLayout(5, 1));
 		Border topBD = BorderFactory.createLineBorder(Color.blue);
-		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Giải mã Vigenere"));
+		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Giải mã Caesar - File"));
 
 		// CipherText
 		JPanel ctPanel = new JPanel();
@@ -105,7 +106,7 @@ public class VigenereDecryptPanel extends JPanel {
 				// Upload File
 				if (e.getActionCommand().equals("Choose File")) {
 					JFileChooser textFileChooser = new JFileChooser("D:\\");
-					int userChoice = textFileChooser.showOpenDialog(VigenereDecryptPanel.this);
+					int userChoice = textFileChooser.showOpenDialog(CaesarDecryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						textFile = textFileChooser.getSelectedFile();
 						ctTextField.setText(textFile.getName());
@@ -116,25 +117,19 @@ public class VigenereDecryptPanel extends JPanel {
 				// Load key
 				if (e.getActionCommand().equals("Load key")) {
 					JFileChooser keyFileChooser = new JFileChooser("D:\\");
-					int userChoice = keyFileChooser.showOpenDialog(VigenereDecryptPanel.this);
+					int userChoice = keyFileChooser.showOpenDialog(CaesarDecryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						keyFile = keyFileChooser.getSelectedFile();
 
-						Vigenere vigenere = new Vigenere();
+						CaesarFile caesar = new CaesarFile();
 						try {
-							vigenereKey = vigenere.readKeyArray(keyFile);
-						} catch (Exception e1) {
+							caesarKey = caesar.readKey(keyFile);
+						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
-						String keyString = "[";
-						for (int i = 0; i < vigenereKey.length; i++) {
-							if (i == vigenereKey.length - 1) {
-								keyString += vigenereKey[i] + "]";
-							} else {
-								keyString += vigenereKey[i] + ", ";
-							}
-						}
-						keyTextField.setText(keyString);
+						keyTextField.setText(String.valueOf(caesarKey));
 						keyUploaded = true;
 					}
 
@@ -146,45 +141,37 @@ public class VigenereDecryptPanel extends JPanel {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
-						// Choose Directory to save decrypted file
-						JFileChooser dirChooser = new JFileChooser("D:\\");
-						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						int userChoice = dirChooser.showSaveDialog(VigenereDecryptPanel.this);
-						if (userChoice == JFileChooser.APPROVE_OPTION) {
-							destDir = dirChooser.getSelectedFile();
+						if (fileUploaded != true) {
+							JOptionPane.showMessageDialog(null, "Source file not uploaded", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} else {
+							// Choose Directory to save decrypted file
+							JFileChooser dirChooser = new JFileChooser("D:\\");
+							dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							int userChoice = dirChooser.showSaveDialog(CaesarDecryptFilePanel.this);
+							if (userChoice == JFileChooser.APPROVE_OPTION) {
+								destDir = dirChooser.getSelectedFile();
 
-							Vigenere vigenere = new Vigenere();
-							String text = "";
-							int[] key;
+								int key = 0;
 
-							// Manual or not
-							if (fileUploaded == true) {
-								text = textFile.getAbsolutePath();
-							} else {
-								text = ctTextField.getText();
-							}
-
-							if (keyUploaded == true) {
-								key = vigenereKey;
-							} else {
-								String keyString = keyTextField.getText();
-								if(vigenere.isNumeric(keyString) == true) {
-									key = vigenere.createKeyBaseOnSize(Integer.parseInt(keyString));
+								// Manual or not
+								if (keyUploaded == true) {
+									key = caesarKey;
 								} else {
-									key = vigenere.createKeyBaseOnKeyWord(keyString);
+									key = Integer.parseInt(keyTextField.getText());
 								}
-							}
 
-							// Decrypting
-							
-							try {
-								vigenere.decrypt(text, key, destDir);
+								// Decrypting
+								CaesarFile caesarFile = new CaesarFile();
+								try {
+									caesarFile.decrypt(textFile, key, destDir);
 
-								// Show result to Text Area
-								txtArea.setText("Result");
-								txtArea.append("\n" + vigenere.getDecryptedString());
-							} catch (Exception e1) {
-								e1.printStackTrace();
+									// Show result to Text Area
+									txtArea.setText("Result");
+									txtArea.append("\nFile decrypted successfully");
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
 							}
 						}
 					}

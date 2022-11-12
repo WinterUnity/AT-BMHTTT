@@ -3,18 +3,19 @@ package DecryptPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.Vigenere;
+import EncryptMethod.AffineFile;
 
-public class VigenereDecryptPanel extends JPanel {
+public class AffineDecryptFilePanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File textFile, keyFile, destDir;
-	int[] vigenereKey;
+	int[] affineKey;
 	boolean fileUploaded, keyUploaded;
 
-	public VigenereDecryptPanel() {
+	public AffineDecryptFilePanel() {
 		setLayout(new BorderLayout());
 
 		/*
@@ -23,7 +24,7 @@ public class VigenereDecryptPanel extends JPanel {
 		top = new JPanel();
 		top.setLayout(new GridLayout(5, 1));
 		Border topBD = BorderFactory.createLineBorder(Color.blue);
-		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Giải mã Vigenere"));
+		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Giải mã Affine"));
 
 		// CipherText
 		JPanel ctPanel = new JPanel();
@@ -37,17 +38,29 @@ public class VigenereDecryptPanel extends JPanel {
 
 		top.add(ctPanel);
 
-		// Key
-		JPanel keyPanel = new JPanel();
-		keyPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		// KeyA
+		JPanel keyAPanel = new JPanel();
+		keyAPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JLabel keyLabel = new JLabel("Key");
-		JTextField keyTextField = new JTextField(30);
-		keyTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		keyPanel.add(keyLabel);
-		keyPanel.add(keyTextField);
+		JLabel keyALabel = new JLabel("KeyA");
+		JTextField keyATextField = new JTextField(30);
+		keyATextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		keyAPanel.add(keyALabel);
+		keyAPanel.add(keyATextField);
 
-		top.add(keyPanel);
+		top.add(keyAPanel);
+
+		// KeyB
+		JPanel keyBPanel = new JPanel();
+		keyBPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+		JLabel keyBLabel = new JLabel("KeyB");
+		JTextField keyBTextField = new JTextField(30);
+		keyBTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		keyBPanel.add(keyBLabel);
+		keyBPanel.add(keyBTextField);
+
+		top.add(keyBPanel);
 
 		/*
 		 * Mid Layout
@@ -105,7 +118,7 @@ public class VigenereDecryptPanel extends JPanel {
 				// Upload File
 				if (e.getActionCommand().equals("Choose File")) {
 					JFileChooser textFileChooser = new JFileChooser("D:\\");
-					int userChoice = textFileChooser.showOpenDialog(VigenereDecryptPanel.this);
+					int userChoice = textFileChooser.showOpenDialog(AffineDecryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						textFile = textFileChooser.getSelectedFile();
 						ctTextField.setText(textFile.getName());
@@ -116,25 +129,18 @@ public class VigenereDecryptPanel extends JPanel {
 				// Load key
 				if (e.getActionCommand().equals("Load key")) {
 					JFileChooser keyFileChooser = new JFileChooser("D:\\");
-					int userChoice = keyFileChooser.showOpenDialog(VigenereDecryptPanel.this);
+					int userChoice = keyFileChooser.showOpenDialog(AffineDecryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						keyFile = keyFileChooser.getSelectedFile();
 
-						Vigenere vigenere = new Vigenere();
+						AffineFile affinefile = new AffineFile();
 						try {
-							vigenereKey = vigenere.readKeyArray(keyFile);
-						} catch (Exception e1) {
+							affineKey = affinefile.readKey(keyFile);
+						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
-						String keyString = "[";
-						for (int i = 0; i < vigenereKey.length; i++) {
-							if (i == vigenereKey.length - 1) {
-								keyString += vigenereKey[i] + "]";
-							} else {
-								keyString += vigenereKey[i] + ", ";
-							}
-						}
-						keyTextField.setText(keyString);
+						keyATextField.setText(String.valueOf(affineKey[0]));
+						keyBTextField.setText(String.valueOf(affineKey[1]));
 						keyUploaded = true;
 					}
 
@@ -142,49 +148,44 @@ public class VigenereDecryptPanel extends JPanel {
 
 				// Decryption
 				if (e.getActionCommand().equals("Decrypt")) {
-					if (ctTextField.getText().isBlank() || keyTextField.getText().isBlank()) {
+					if (ctTextField.getText().isBlank() || keyATextField.getText().isBlank()
+							|| keyBTextField.getText().isBlank()) {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
-						// Choose Directory to save decrypted file
-						JFileChooser dirChooser = new JFileChooser("D:\\");
-						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						int userChoice = dirChooser.showSaveDialog(VigenereDecryptPanel.this);
-						if (userChoice == JFileChooser.APPROVE_OPTION) {
-							destDir = dirChooser.getSelectedFile();
+						if (fileUploaded == true) {
+							JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} else {
+							// Choose Directory to save decrypted file
+							JFileChooser dirChooser = new JFileChooser("D:\\");
+							dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							int userChoice = dirChooser.showSaveDialog(AffineDecryptFilePanel.this);
+							if (userChoice == JFileChooser.APPROVE_OPTION) {
+								destDir = dirChooser.getSelectedFile();
 
-							Vigenere vigenere = new Vigenere();
-							String text = "";
-							int[] key;
+								int[] key = new int[2];
 
-							// Manual or not
-							if (fileUploaded == true) {
-								text = textFile.getAbsolutePath();
-							} else {
-								text = ctTextField.getText();
-							}
+								// Manual or not
 
-							if (keyUploaded == true) {
-								key = vigenereKey;
-							} else {
-								String keyString = keyTextField.getText();
-								if(vigenere.isNumeric(keyString) == true) {
-									key = vigenere.createKeyBaseOnSize(Integer.parseInt(keyString));
+								if (keyUploaded == true) {
+									key = affineKey;
 								} else {
-									key = vigenere.createKeyBaseOnKeyWord(keyString);
+									key[0] = Integer.parseInt(keyATextField.getText());
+									key[1] = Integer.parseInt(keyBTextField.getText());
 								}
-							}
 
-							// Decrypting
-							
-							try {
-								vigenere.decrypt(text, key, destDir);
+								// Decrypting
+								AffineFile affineFile = new AffineFile();
+								try {
+									affineFile.decrypt(textFile, key, destDir);
 
-								// Show result to Text Area
-								txtArea.setText("Result");
-								txtArea.append("\n" + vigenere.getDecryptedString());
-							} catch (Exception e1) {
-								e1.printStackTrace();
+									// Show result to Text Area
+									txtArea.setText("Result");
+									txtArea.append("File decrypted successfully");
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
 							}
 						}
 					}
