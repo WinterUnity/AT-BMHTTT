@@ -70,6 +70,7 @@ public class Vigenere {
 		for (int i = 0; i < stringArray.length; i++) {
 			key[i] = Integer.valueOf(stringArray[i]);
 		}
+		br.close();
 
 		return key;
 	}
@@ -79,7 +80,8 @@ public class Vigenere {
 		BufferedReader br = new BufferedReader(fr);
 		String keyString = br.readLine();
 		key = createKeyBaseOnKeyWord(keyString);
-
+		br.close();
+		
 		return key;
 	}
 
@@ -204,16 +206,6 @@ public class Vigenere {
 		}
 	}
 
-	private int findKeyA2(int key) {
-		int result = 0, half = alphabet.length() / 2;
-		for (int i = 0; i < half; i++) {
-			if ((i * key) % half == 1) {
-				result = i;
-			}
-		}
-		return result;
-	}
-	
 	public boolean isNumeric(String strNum) {
 	    if (strNum == null) {
 	        return false;
