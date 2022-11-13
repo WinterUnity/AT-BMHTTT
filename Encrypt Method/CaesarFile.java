@@ -93,7 +93,7 @@ public class CaesarFile {
 				fileContent[i] = (byte) (fileContent[i] - key);
 			}
 			
-			// Create encrypted file
+			// Create decrypted file
 			try {
 				File destFile = new File(destDir.getAbsolutePath() + "\\CaesarDecryptedFile" + getFileExtension(srcFile));
 				FileOutputStream fos = new FileOutputStream(destFile);

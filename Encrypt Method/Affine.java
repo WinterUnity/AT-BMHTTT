@@ -24,7 +24,7 @@ public class Affine {
 	 */
 	public int[] createKey() throws IOException {
 		Random rd = new Random();
-		while (keyA1 == 0 || this.isPrime(keyA1) != true) {
+		while (keyA1 == 0 || this.isPrime(keyA1) == false) {
 			keyA1 = rd.nextInt(alphabet.length() / 2);
 			keyPair[0] = keyA1;
 		}
@@ -35,15 +35,21 @@ public class Affine {
 	}
 
 	private boolean isPrime(int number) {
-		if (number < 2) {
+		if(number <= 2) {
 			return false;
 		}
-		for (int i = 3; i < number; i++) {
+		
+		int count = 0;
+		for (int i = 2; i <= Math.sqrt(number); i++) {
 			if (number % i == 0) {
-				return false;
+				count++;
 			}
 		}
-		return true;
+		if (count == 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -55,7 +61,7 @@ public class Affine {
 		FileReader fr = new FileReader(srcFile);
 		BufferedReader br = new BufferedReader(fr);
 		String keyString = br.readLine();
-		String[] stringArray = keyString.replace("\\[", "").replace("]", "").split(", ");
+		String[] stringArray = keyString.replace("[", "").replace("]", "").split(", ");
 		keyPair[0] = Integer.valueOf(stringArray[0]);
 		keyPair[1] = Integer.valueOf(stringArray[1]);
 		br.close();

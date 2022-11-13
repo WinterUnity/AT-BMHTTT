@@ -174,11 +174,12 @@ public class Vigenere {
 					}
 					if (j < half) {
 						if (j - key[count2] < 0) {
-							number = (j - key[count2]) + half;
+							number = ((j - key[count2]) % half) + half;
+							decryptedString += alphabet.charAt(number);
 						} else {
 							number = (j - key[count2]);
+							decryptedString += alphabet.charAt(number);
 						}
-						decryptedString += alphabet.charAt(number);
 					} else {
 						number = (j - key[count2]) % half + half;
 						decryptedString += alphabet.charAt(number);
@@ -193,12 +194,12 @@ public class Vigenere {
 			}
 		}
 
-		// Create encrypted file
+		// Create decrypted file
 		try {
-			File destFile = new File(destDir.getAbsolutePath() + "\\VigenereEncrypted.txt");
+			File destFile = new File(destDir.getAbsolutePath() + "\\VigenereDecrypted.txt");
 			FileWriter fw = new FileWriter(destFile);
 			PrintWriter pw = new PrintWriter(fw);
-			pw.println(encryptedString);
+			pw.println(decryptedString);
 			pw.close();
 			fw.close();
 		} catch (Exception e) {
