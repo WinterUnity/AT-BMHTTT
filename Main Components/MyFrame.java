@@ -61,7 +61,7 @@ public class MyFrame extends JFrame {
 		/*
 		 * Encrypt Menu
 		 */
-		JMenu encryptMenu = new JMenu("Mã hóa");
+		JMenu encryptMenu = new JMenu("Mã hóa văn bản");
 		menuBar.add(encryptMenu);
 
 		// Caesar encrypt menu item
@@ -99,7 +99,7 @@ public class MyFrame extends JFrame {
 		/*
 		 * Decrypt Menu
 		 */
-		JMenu decryptMenu = new JMenu("Giải mã");
+		JMenu decryptMenu = new JMenu("Giải mã văn bản");
 		menuBar.add(decryptMenu);
 
 		// Caesar decrypt menu item
@@ -146,15 +146,15 @@ public class MyFrame extends JFrame {
 		caesarEncryptFileItem.addActionListener(itemAction);
 		encryptFileMenu.add(caesarEncryptFileItem);
 
-		// Substitution encrypt menu item
-		encryptFileMenu.addSeparator();
-		JMenuItem subEncryptFileItem = new JMenuItem("Mã hóa Substitution");
-		subEncryptFileItem.setMnemonic(KeyEvent.VK_S);
-		subEncryptFileItem.setActionCommand("SubstitutionEncryptFile");
-		subEncryptFileItem.addActionListener(itemAction);
-		encryptFileMenu.add(subEncryptFileItem);
+//		// Substitution encrypt file menu item
+//		encryptFileMenu.addSeparator();
+//		JMenuItem subEncryptFileItem = new JMenuItem("Mã hóa Substitution");
+//		subEncryptFileItem.setMnemonic(KeyEvent.VK_S);
+//		subEncryptFileItem.setActionCommand("SubstitutionEncryptFile");
+//		subEncryptFileItem.addActionListener(itemAction);
+//		encryptFileMenu.add(subEncryptFileItem);
 
-		// Affine encrypt menu item
+		// Affine encrypt file menu item
 		encryptFileMenu.addSeparator();
 		JMenuItem affineEncryptFileItem = new JMenuItem("Mã hóa Affine");
 		affineEncryptFileItem.setMnemonic(KeyEvent.VK_A);
@@ -163,14 +163,21 @@ public class MyFrame extends JFrame {
 		affineEncryptFileItem.addActionListener(itemAction);
 		encryptFileMenu.add(affineEncryptFileItem);
 
-		// Vigenere encrypt menu item
+		// Vigenere encrypt file menu item
 		encryptFileMenu.addSeparator();
 		JMenuItem vigenereEncryptFileItem = new JMenuItem("Mã hóa Vigenere");
 		vigenereEncryptFileItem.setMnemonic(KeyEvent.VK_V);
-		vigenereEncryptFileItem.setActionCommand("VigenereEncryptItem");
+		vigenereEncryptFileItem.setActionCommand("VigenereEncryptFile");
 		vigenereEncryptFileItem.addActionListener(itemAction);
 		encryptFileMenu.add(vigenereEncryptFileItem);
-		
+
+		// AES encrypt file menu item
+		encryptFileMenu.addSeparator();
+		JMenuItem aesEncryptFileItem = new JMenuItem("Mã hóa AES");
+		aesEncryptFileItem.setActionCommand("AESEncryptFile");
+		aesEncryptFileItem.addActionListener(itemAction);
+		encryptFileMenu.add(aesEncryptFileItem);
+
 		/*
 		 * Decrypt File Menu
 		 */
@@ -184,13 +191,13 @@ public class MyFrame extends JFrame {
 		caesarDecryptFileItem.addActionListener(itemAction);
 		decryptFileMenu.add(caesarDecryptFileItem);
 
-		// Substitution decrypt file menu item
-		decryptFileMenu.addSeparator();
-		JMenuItem subDecryptFileItem = new JMenuItem("Giải mã Substitution");
-		subDecryptFileItem.setMnemonic(KeyEvent.VK_S);
-		subDecryptFileItem.setActionCommand("SubstitutionDecryptFile");
-		subDecryptFileItem.addActionListener(itemAction);
-		decryptFileMenu.add(subDecryptFileItem);
+//		// Substitution decrypt file menu item
+//		decryptFileMenu.addSeparator();
+//		JMenuItem subDecryptFileItem = new JMenuItem("Giải mã Substitution");
+//		subDecryptFileItem.setMnemonic(KeyEvent.VK_S);
+//		subDecryptFileItem.setActionCommand("SubstitutionDecryptFile");
+//		subDecryptFileItem.addActionListener(itemAction);
+//		decryptFileMenu.add(subDecryptFileItem);
 
 		// Affine decrypt file menu item
 		decryptFileMenu.addSeparator();
@@ -207,6 +214,13 @@ public class MyFrame extends JFrame {
 		vigenereDecryptFileItem.setActionCommand("VigenereDecryptFile");
 		vigenereDecryptFileItem.addActionListener(itemAction);
 		decryptFileMenu.add(vigenereDecryptFileItem);
+
+		// AES decrypt file menu item
+		decryptFileMenu.addSeparator();
+		JMenuItem aesDecryptFileItem = new JMenuItem("Giải mã AES");
+		aesDecryptFileItem.setActionCommand("AESDecryptFile");
+		aesDecryptFileItem.addActionListener(itemAction);
+		decryptFileMenu.add(aesDecryptFileItem);
 
 		return menuBar;
 	}

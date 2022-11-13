@@ -6,13 +6,16 @@ import java.awt.*;
 import java.awt.event.*;
 import EncryptPanel.*;
 import DecryptPanel.*;
+import EncryptMethod.AffineFile;
 
 public class MyPanel extends JPanel{
 	JPanel mainPanel, defaultPanel,
 			caesarEncryptPanel, substitutionEncryptPanel, affineEncryptPanel, vigenereEncryptPanel,
 			caesarDecryptPanel, substitutionDecryptPanel, affineDecryptPanel, vigenereDecryptPanel,
 			caesarEncryptFilePanel, substitutionEncryptFilePanel, affineEncryptFilePanel, vigenereEncryptFilePanel,
-			caesarDecryptFilePanel, substitutionDecryptFilePanel, affineDecryptFilePanel, vigenereDecryptFilePanel;
+			caesarDecryptFilePanel, substitutionDecryptFilePanel, affineDecryptFilePanel, vigenereDecryptFilePanel,
+			aesEncryptFilePanel, rsaEncryptFilePanel,
+			aesDecryptFilePanel, rsaDecryptFllepanel;
 	
 	CardLayout cardLayout;
 	
@@ -34,8 +37,14 @@ public class MyPanel extends JPanel{
 		vigenereDecryptPanel = new VigenereDecryptPanel();
 		
 		caesarEncryptFilePanel = new CaesarEncryptFilePanel();
+		affineEncryptFilePanel = new AffineEncryptFilePanel();
+		vigenereEncryptFilePanel = new VigenereEncryptFilePanel();
+		aesEncryptFilePanel = new AESEncryptFilePanel();
 		
 		caesarDecryptFilePanel = new CaesarDecryptFilePanel();
+		affineDecryptFilePanel = new AffineDecryptFilePanel();
+		vigenereDecryptFilePanel = new VigenereDecryptFilePanel();
+		aesDecryptFilePanel = new AESDecryptFilePanel();
 		
 		
 		
@@ -51,8 +60,14 @@ public class MyPanel extends JPanel{
 		mainPanel.add("VigenereDecrypt", vigenereDecryptPanel);
 		
 		mainPanel.add("CaesarEncryptFile", caesarEncryptFilePanel);
+		mainPanel.add("AffineEncryptFile", affineEncryptFilePanel);
+		mainPanel.add("VigenereEncryptFile", vigenereEncryptFilePanel);
+		mainPanel.add("AESEncryptFile", aesEncryptFilePanel);
 		
 		mainPanel.add("CaesarDecryptFile", caesarDecryptFilePanel);
+		mainPanel.add("AffineDecryptFile", affineDecryptFilePanel);
+		mainPanel.add("VigenereDecryptFile", vigenereDecryptFilePanel);
+		mainPanel.add("AESDecryptFile", aesDecryptFilePanel);
 		
 		add(mainPanel, BorderLayout.CENTER);
 	}
