@@ -6,15 +6,15 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.Vigenere;
+import EncryptMethod.VigenereFile;
 
-public class VigenereEncryptPanel extends JPanel {
+public class VigenereEncryptFilePanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File srcFile, keyFile, destDir;
 	int[] vigenereKey;
 	boolean fileUploaded, keyUploaded, keyCreated;
 
-	public VigenereEncryptPanel() {
+	public VigenereEncryptFilePanel() {
 		setLayout(new BorderLayout());
 
 		/*
@@ -23,7 +23,7 @@ public class VigenereEncryptPanel extends JPanel {
 		top = new JPanel();
 		top.setLayout(new GridLayout(5, 1));
 		Border topBD = BorderFactory.createLineBorder(Color.blue);
-		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Mã hóa Vigenere"));
+		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Mã hóa Vigenere - File"));
 
 		// PlainText
 		JPanel ptPanel = new JPanel();
@@ -110,48 +110,48 @@ public class VigenereEncryptPanel extends JPanel {
 				// Upload File
 				if (e.getActionCommand().equals("Choose File")) {
 					JFileChooser fileChooser = new JFileChooser("D:\\");
-					int userChoice = fileChooser.showOpenDialog(VigenereEncryptPanel.this);
+					int userChoice = fileChooser.showOpenDialog(VigenereEncryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						srcFile = fileChooser.getSelectedFile();
 						ptTextField.setText(srcFile.getName());
 						fileUploaded = true;
 					}
 				}
-				
+
 				// Upload Key
 				if (e.getActionCommand().equals("Upload Key")) {
 					JFileChooser keyFileChooser = new JFileChooser("D:\\");
-					int userChoice = keyFileChooser.showOpenDialog(VigenereEncryptPanel.this);
+					int userChoice = keyFileChooser.showOpenDialog(VigenereEncryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						keyFile = keyFileChooser.getSelectedFile();
-						
-						Vigenere vigenere = new Vigenere();
-						
+
+						VigenereFile vigenereFile = new VigenereFile();
+
 						try {
 							FileReader fr = new FileReader(keyFile);
 							BufferedReader br = new BufferedReader(fr);
 							String keyString = br.readLine();
-							if(keyString.contains("[")) {
-								if(keyString.contains("]")) {
-									vigenereKey = vigenere.readKeyArray(keyFile);
+							if (keyString.contains("\\[")) {
+								if (keyString.contains("]")) {
+									vigenereKey = vigenereFile.readKeyArray(keyFile);
 								}
 							} else {
-								vigenereKey = vigenere.readKeyString(keyFile);
+								vigenereKey = vigenereFile.readKeyString(keyFile);
 							}
 							keyTextField.setText(keyString);
 							br.close();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
-						
+
 						keyUploaded = true;
 					}
 				}
 
 				// Create key
 				if (e.getActionCommand().equals("Create key")) {
-					Vigenere vigenere = new Vigenere();
-					vigenereKey = vigenere.createKeyBaseOnSize(10);
+					VigenereFile vigenereFile = new VigenereFile();
+					vigenereKey = vigenereFile.createKeyBaseOnSize(10);
 					String keyString = "[";
 					for (int i = 0; i < vigenereKey.length; i++) {
 						if (i == vigenereKey.length - 1) {
@@ -170,63 +170,61 @@ public class VigenereEncryptPanel extends JPanel {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
-						JFileChooser dirChooser = new JFileChooser("D:\\");
-						dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						int userChoice = dirChooser.showSaveDialog(VigenereEncryptPanel.this);
-						if (userChoice == JFileChooser.APPROVE_OPTION) {
-							destDir = dirChooser.getSelectedFile();
+						if (fileUploaded != true) {
+							JOptionPane.showMessageDialog(null, "Source file not uploaded", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} else {
+							JFileChooser dirChooser = new JFileChooser("D:\\");
+							dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							int userChoice = dirChooser.showSaveDialog(VigenereEncryptFilePanel.this);
+							if (userChoice == JFileChooser.APPROVE_OPTION) {
+								destDir = dirChooser.getSelectedFile();
 
-							Vigenere vigenere = new Vigenere();
-							String text = "";
-							int[] key;
+								VigenereFile vigenereFile = new VigenereFile();
+								int[] key;
 
-							// Manual or not
-							if (fileUploaded == true) {
-								text = srcFile.getAbsolutePath();
-							} else {
-								text = ptTextField.getText();
-							}
-
-							if (keyCreated == true || keyUploaded == true) {
-								key = vigenereKey;
-							} else {
-								String keyString = keyTextField.getText();
-								if(vigenere.isNumeric(keyString) == true) {
-									key = vigenere.createKeyBaseOnSize(Integer.parseInt(keyString));
+								// Manual or not
+								if (keyCreated == true || keyUploaded == true) {
+									key = vigenereKey;
 								} else {
-									key = vigenere.createKeyBaseOnKeyWord(keyString);
-								}
-							}
-
-							// Encrypting
-							try {
-								vigenere.encrypt(text, key, destDir);
-
-								// Show result to Text Area
-								txtArea.setText("Result");
-								txtArea.append("\n" + vigenere.getEncryptedString());
-
-								// Print key file
-								String keyPrint = "";
-								for (int i = 0; i < vigenereKey.length; i++) {
-									if (i == vigenereKey.length - 1) {
-										keyPrint += vigenereKey[i] + "]";
+									String keyString = keyTextField.getText();
+									if (vigenereFile.isNumeric(keyString) == true) {
+										key = vigenereFile.createKeyBaseOnSize(Integer.parseInt(keyString));
 									} else {
-										if(i == 0) {
-											keyPrint += "[" + vigenereKey[0] + ", ";
-										} else {
-											keyPrint += vigenereKey[i] + ", ";
-										}
+										key = vigenereFile.createKeyBaseOnKeyWord(keyString);
 									}
 								}
-								File destFile = new File(destDir.getAbsolutePath() + "\\VigenereKey.txt");
-								FileWriter fw = new FileWriter(destFile);
-								PrintWriter pw = new PrintWriter(fw);
-								pw.println(keyPrint);
-								pw.close();
-								fw.close();
-							} catch (Exception e1) {
-								e1.printStackTrace();
+
+								// Encrypting
+								try {
+									vigenereFile.encrypt(srcFile, key, destDir);
+
+									// Show result to Text Area
+									txtArea.setText("Result");
+									txtArea.append("\nFile encrypted successfully");
+
+									// Print key file
+									String keyPrint = "";
+									for (int i = 0; i < vigenereKey.length; i++) {
+										if (i == vigenereKey.length - 1) {
+											keyPrint += vigenereKey[i] + "]";
+										} else {
+											if (i == 0) {
+												keyPrint += "[" + vigenereKey[0] + ", ";
+											} else {
+												keyPrint += vigenereKey[i] + ", ";
+											}
+										}
+									}
+									File destFile = new File(destDir.getAbsolutePath() + "\\VigenereFileKey.txt");
+									FileWriter fw = new FileWriter(destFile);
+									PrintWriter pw = new PrintWriter(fw);
+									pw.println(keyPrint);
+									pw.close();
+									fw.close();
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
 							}
 						}
 					}
