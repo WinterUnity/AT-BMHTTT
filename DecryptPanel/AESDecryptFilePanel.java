@@ -4,18 +4,21 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
+import javax.crypto.SecretKey;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import EncryptMethod.AffineFile;
+import EncryptMethod.AES;
 
-public class AffineDecryptFilePanel extends JPanel {
+public class AESDecryptFilePanel extends JPanel {
 	JPanel top, mid, bot, subPanel;
 	File textFile, keyFile, destDir;
-	int[] affineKey;
+	SecretKey aesKey;
+	
+	String srcFilePath, destFilePath;
 	boolean fileUploaded, keyUploaded;
 
-	public AffineDecryptFilePanel() {
+	public AESDecryptFilePanel() {
 		setLayout(new BorderLayout());
 
 		/*
@@ -24,7 +27,7 @@ public class AffineDecryptFilePanel extends JPanel {
 		top = new JPanel();
 		top.setLayout(new GridLayout(5, 1));
 		Border topBD = BorderFactory.createLineBorder(Color.blue);
-		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Giải mã Affine - File"));
+		top.setBorder(BorderFactory.createTitledBorder(topBD, "Thông tin - Giải mã AES - File"));
 
 		// CipherText
 		JPanel ctPanel = new JPanel();
@@ -38,29 +41,17 @@ public class AffineDecryptFilePanel extends JPanel {
 
 		top.add(ctPanel);
 
-		// KeyA
-		JPanel keyAPanel = new JPanel();
-		keyAPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		// Key
+		JPanel keyPanel = new JPanel();
+		keyPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JLabel keyALabel = new JLabel("KeyA");
-		JTextField keyATextField = new JTextField(30);
-		keyATextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		keyAPanel.add(keyALabel);
-		keyAPanel.add(keyATextField);
+		JLabel keyLabel = new JLabel("Key");
+		JTextField keyTextField = new JTextField(30);
+		keyTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+		keyPanel.add(keyLabel);
+		keyPanel.add(keyTextField);
 
-		top.add(keyAPanel);
-
-		// KeyB
-		JPanel keyBPanel = new JPanel();
-		keyBPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
-		JLabel keyBLabel = new JLabel("KeyB");
-		JTextField keyBTextField = new JTextField(30);
-		keyBTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-		keyBPanel.add(keyBLabel);
-		keyBPanel.add(keyBTextField);
-
-		top.add(keyBPanel);
+		top.add(keyPanel);
 
 		/*
 		 * Mid Layout
@@ -118,7 +109,7 @@ public class AffineDecryptFilePanel extends JPanel {
 				// Upload File
 				if (e.getActionCommand().equals("Choose File")) {
 					JFileChooser textFileChooser = new JFileChooser("D:\\");
-					int userChoice = textFileChooser.showOpenDialog(AffineDecryptFilePanel.this);
+					int userChoice = textFileChooser.showOpenDialog(AESDecryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						textFile = textFileChooser.getSelectedFile();
 						ctTextField.setText(textFile.getName());
@@ -129,18 +120,17 @@ public class AffineDecryptFilePanel extends JPanel {
 				// Load key
 				if (e.getActionCommand().equals("Load key")) {
 					JFileChooser keyFileChooser = new JFileChooser("D:\\");
-					int userChoice = keyFileChooser.showOpenDialog(AffineDecryptFilePanel.this);
+					int userChoice = keyFileChooser.showOpenDialog(AESDecryptFilePanel.this);
 					if (userChoice == JFileChooser.APPROVE_OPTION) {
 						keyFile = keyFileChooser.getSelectedFile();
 
-						AffineFile affineFile = new AffineFile();
+						AES aes = new AES();
 						try {
-							affineKey = affineFile.readKey(keyFile);
-						} catch (IOException e1) {
+							aesKey = aes.readKey(keyFile.getAbsolutePath());
+						} catch (ClassNotFoundException e1) {
 							e1.printStackTrace();
 						}
-						keyATextField.setText(String.valueOf(affineKey[0]));
-						keyBTextField.setText(String.valueOf(affineKey[1]));
+						keyTextField.setText(aesKey.toString());
 						keyUploaded = true;
 					}
 
@@ -148,36 +138,31 @@ public class AffineDecryptFilePanel extends JPanel {
 
 				// Decryption
 				if (e.getActionCommand().equals("Decrypt")) {
-					if (ctTextField.getText().isBlank() || keyATextField.getText().isBlank()
-							|| keyBTextField.getText().isBlank()) {
+					if (ctTextField.getText().isBlank() || keyTextField.getText().isBlank()) {
 						JOptionPane.showMessageDialog(null, "There is no plain text or key", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
 						if (fileUploaded != true) {
 							JOptionPane.showMessageDialog(null, "Source file not uploaded", "Error",
 									JOptionPane.ERROR_MESSAGE);
+						} 
+						if (keyUploaded != true) {
+							JOptionPane.showMessageDialog(null, "key not uploaded", "Error",
+									JOptionPane.ERROR_MESSAGE);
 						} else {
+							AES aes = new AES();
 							// Choose Directory to save decrypted file
 							JFileChooser dirChooser = new JFileChooser("D:\\");
 							dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-							int userChoice = dirChooser.showSaveDialog(AffineDecryptFilePanel.this);
+							int userChoice = dirChooser.showSaveDialog(AESDecryptFilePanel.this);
 							if (userChoice == JFileChooser.APPROVE_OPTION) {
 								destDir = dirChooser.getSelectedFile();
-
-								int[] key = new int[2];
-
-								// Manual or not
-								if (keyUploaded == true) {
-									key = affineKey;
-								} else {
-									key[0] = Integer.parseInt(keyATextField.getText());
-									key[1] = Integer.parseInt(keyBTextField.getText());
-								}
-
+								destFilePath = destDir.getAbsolutePath() + "\\CaesarDecryptedFile" + aes.getFileExtension(textFile);
+								srcFilePath = textFile.getAbsolutePath();
+								
 								// Decrypting
-								AffineFile affineFile = new AffineFile();
 								try {
-									affineFile.decrypt(textFile, key, destDir);
+									aes.decryptFile(srcFilePath, aesKey, destFilePath);
 
 									// Show result to Text Area
 									txtArea.setText("Result");
